@@ -18,15 +18,15 @@ jobs:
         DOWNLOAD_URL: ${{ github.event.client_payload.download_url }}
         VPS_CALLBACK_URL: ${{ github.event.client_payload.callback_url }}
       run: |
-        RANDOM_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1).mp4
+        RANDOM_NAME=$(date +%s%N | md5sum | head -c 8).mp4
         
         echo "=== BẮT ĐẦU TẢI VIDEO TỪ LINK ĐẦU VÀO ==="
-        curl -L -o "$RANDOM_NAME" "$DOWNLOAD_URL"
+        curl -L -# "$DOWNLOAD_URL" -o "$RANDOM_NAME" 2>&1 | tr '\r' '\n'
 
         echo "=== BẮT ĐẦU UPLOAD LÊN HYDRAX ==="
-        RESPONSE=$(curl -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY")
+        RESPONSE=$(curl -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY" -# 2>&1 | tr '\r' '\n')
         
-        HYDRAX_TAG=$(echo $RESPONSE | grep -o '"slug":"[^"]*' | grep -o '[^"]*$')
+        HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | grep -o '[^"]*$')
         
         if [ ! -z "$HYDRAX_TAG" ]; then
           echo "Upload video mới thành công lên Hydrax: $HYDRAX_TAG"
