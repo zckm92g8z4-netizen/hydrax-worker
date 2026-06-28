@@ -21,10 +21,10 @@ jobs:
         RANDOM_NAME=$(date +%s%N | md5sum | head -c 8).mp4
         
         echo "=== BẮT ĐẦU TẢI VIDEO TỪ LINK ĐẦU VÀO ==="
-        curl -L -# "$DOWNLOAD_URL" -o "$RANDOM_NAME" 2>&1 | tr '\r' '\n'
+        curl -L "$DOWNLOAD_URL" -o "$RANDOM_NAME" 2>&1 | tr '\r' '\n'
 
         echo "=== BẮT ĐẦU UPLOAD LÊN HYDRAX ==="
-        RESPONSE=$(curl -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY" -# 2>&1 | tr '\r' '\n')
+        RESPONSE=$(curl -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY" 2>&1 | tr '\r' '\n')
         
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | grep -o '[^"]*$')
         
