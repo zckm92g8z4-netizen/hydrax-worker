@@ -66,13 +66,13 @@ jobs:
             exit(1)
 
         if hydrax_tag and vps_callback_url:
+        
             callback_payload = {
-                "status": "success",
-                "download_url": download_url,
                 "hydrax_tag": hydrax_tag
             }
             try:
-                requests.post(vps_callback_url, json=callback_payload, timeout=30)
+                headers = {"Content-Type": "application/json"}
+                requests.post(vps_callback_url, json=callback_payload, headers=headers, timeout=30)
             except Exception as e:
                 pass
         else:
