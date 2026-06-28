@@ -1,0 +1,81 @@
+name: Hydrax Video Worker
+
+on:
+  repository_dispatch:
+    types: [trigger-download-upload]
+
+jobs:
+  process-video:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Download, Upload to Hydrax and Callback to VPS
+      env:
+        HYDRAX_API_KEY: ${{ secrets.HYDRAX_API_KEY }}
+        DOWNLOAD_URL: ${{ github.event.client_payload.download_url }}
+        VPS_CALLBACK_URL: ${{ github.event.client_payload.callback_url }}
+      run: |
+        python - << 'EOF'
+        import os
+        import random
+        import string
+        import requests
+
+        api_key = os.environ.get("HYDRAX_API_KEY")
+        download_url = os.environ.get("DOWNLOAD_URL")
+        vps_callback_url = os.environ.get("VPS_CALLBACK_URL")
+
+        random_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8)) + '.mp4'
+
+        try:
+            with requests.get(download_url, stream=True, timeout=60) as r:
+                r.raise_for_status()
+                with open(random_name, 'wb') as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+        except Exception as e:
+            exit(1)
+
+        hydrax_upload_url = f"https://up.abyss.to/{api_key}"
+        files = {
+            'file': (random_name, open(random_name, 'rb'), 'video/mp4')
+        }
+
+        hydrax_tag = None
+        try:
+            response = requests.post(hydrax_upload_url, files=files, timeout=1800)
+            if response.status_code == 200:
+                res_data = response.json()
+                hydrax_tag = res_data.get("slug")
+            else:
+                exit(1)
+        except Exception as e:
+            exit(1)
+
+        if hydrax_tag and vps_callback_url:
+            callback_payload = {
+                "status": "success",
+                "download_url": download_url,
+                "hydrax_tag": hydrax_tag
+            }
+            try:
+                requests.post(vps_callback_url, json=callback_payload, timeout=30)
+            except Exception as e:
+                pass
+        else:
+            exit(1)
+
+        EOF
