@@ -42,10 +42,11 @@ jobs:
           # Dùng curl -v (verbose) để in ra TOÀN BỘ quá trình bắt tay kết nối, 
           # kiểm tra chứng chỉ SSL và phản hồi HTTP Status (200, 403, 404, 500) từ VPS.
           curl -v -X POST \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
             -H "Content-Type: application/json" \
             -H "X-Worker-Token: $SECRET_AUTH_KEY" \
-            -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
-            "$FULL_CALLBACK_URL"
+            -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\", \"secret\":\"$SECRET_AUTH_KEY\"}" \
+            "$VPS_CALLBACK_URL"
             
         else
           echo "Lỗi Upload. Phản hồi thực tế từ Hydrax: $RESPONSE"
