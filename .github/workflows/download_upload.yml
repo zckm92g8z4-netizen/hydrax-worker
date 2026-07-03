@@ -34,13 +34,8 @@ jobs:
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
           echo "Upload video mới thành công lên Hydrax. Tag: $HYDRAX_TAG"
           
-          FULL_CALLBACK_URL="${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
+          echo "=== TIẾN HÀNH GỌI CALLBACK VỀ VPS (NGINX) ==="
           
-          echo "=== TIẾN HÀNH GỌI CALLBACK VỀ VPS ==="
-          echo "URL gọi về: $VPS_CALLBACK_URL (Đã ẩn secret)"
-          
-          # Dùng curl -v (verbose) để in ra TOÀN BỘ quá trình bắt tay kết nối, 
-          # kiểm tra chứng chỉ SSL và phản hồi HTTP Status (200, 403, 404, 500) từ VPS.
           curl -v -X POST \
             -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
             -H "Content-Type: application/json" \
