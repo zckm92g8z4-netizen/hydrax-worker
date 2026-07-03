@@ -36,13 +36,17 @@ jobs:
           
           FULL_CALLBACK_URL="${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
           
-          curl -s -X POST \
+          echo "=== TIẾN HÀNH GỌI CALLBACK VỀ VPS ==="
+          echo "URL gọi về: $VPS_CALLBACK_URL (Đã ẩn secret)"
+          
+          # Dùng curl -v (verbose) để in ra TOÀN BỘ quá trình bắt tay kết nối, 
+          # kiểm tra chứng chỉ SSL và phản hồi HTTP Status (200, 403, 404, 500) từ VPS.
+          curl -v -X POST \
             -H "Content-Type: application/json" \
             -H "X-Worker-Token: $SECRET_AUTH_KEY" \
             -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
             "$FULL_CALLBACK_URL"
             
-          echo "Đã gửi tín hiệu callback về VPS thành công."
         else
           echo "Lỗi Upload. Phản hồi thực tế từ Hydrax: $RESPONSE"
           rm -f "$RANDOM_NAME"
