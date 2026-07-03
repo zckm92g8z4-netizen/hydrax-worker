@@ -30,11 +30,12 @@ jobs:
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | head -n 1 | cut -d'"' -f4)
         
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
-          # Lệnh đặc biệt của GitHub để ghi kết quả ra bảng tóm tắt thô (Job Summary)
-          echo "RESULT_DATA: platform=${PLATFORM} | video_id=${VIDEO_ID} | hydrax_tag=${HYDRAX_TAG}" >> $GITHUB_STEP_SUMMARY
-          echo "Upload thành công. Tag: $HYDRAX_TAG"
+          # GHI ĐÈ TOÀN BỘ KẾT QUẢ VÀO FILE SUMMARY SẠCH
+          echo "PLATFORM: $PLATFORM" > $GITHUB_STEP_SUMMARY
+          echo "VIDEO_ID: $VIDEO_ID" >> $GITHUB_STEP_SUMMARY
+          echo "HYDRAX_TAG: $HYDRAX_TAG" >> $GITHUB_STEP_SUMMARY
         else
-          echo "Lỗi Upload. Phản hồi thực tế từ Hydrax: $RESPONSE"
+          echo "LỖI: Không lấy được slug từ Hydrax"
           rm -f "$RANDOM_NAME"
           exit 1
         fi
