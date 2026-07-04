@@ -15,6 +15,8 @@ jobs:
     - name: Download and Upload with Speed Info
       env:
         HYDRAX_API_KEY: ${{ secrets.HYDRAX_API_KEY }}
+        VPS_CALLBACK_URL: ${{ secrets.VPS_CALLBACK_URL }}
+        SECRET_AUTH_KEY: ${{ secrets.SECRET_AUTH_KEY }}
         DOWNLOAD_URL: ${{ github.event.client_payload.download_url }}
         VIDEO_ID: ${{ github.event.client_payload.video_id }}
         PLATFORM: ${{ github.event.client_payload.platform }}
@@ -30,12 +32,19 @@ jobs:
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | head -n 1 | cut -d'"' -f4)
         
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
-          # GHI ĐÈ TOÀN BỘ KẾT QUẢ VÀO FILE SUMMARY SẠCH
-          echo "PLATFORM: $PLATFORM" > $GITHUB_STEP_SUMMARY
-          echo "VIDEO_ID: $VIDEO_ID" >> $GITHUB_STEP_SUMMARY
-          echo "HYDRAX_TAG: $HYDRAX_TAG" >> $GITHUB_STEP_SUMMARY
+          echo "Upload video mới thành công lên Hydrax. Tag: $HYDRAX_TAG"
+          
+          FULL_CALLBACK_URL="${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
+          
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "X-Worker-Token: $SECRET_AUTH_KEY" \
+            -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
+            "$FULL_CALLBACK_URL"
+            
+          echo "Đã gửi tín hiệu callback về VPS thành công."
         else
-          echo "LỖI: Không lấy được slug từ Hydrax"
+          echo "Lỗi Upload. Phản hồi thực tế từ Hydrax: $RESPONSE"
           rm -f "$RANDOM_NAME"
           exit 1
         fi
