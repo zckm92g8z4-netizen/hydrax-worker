@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository code
+    - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Download and Upload with Speed Info
+    - name: Execute Task
       env:
         HYDRAX_API_KEY: ${{ secrets.HYDRAX_API_KEY }}
         VPS_CALLBACK_URL: ${{ secrets.VPS_CALLBACK_URL }}
@@ -23,28 +23,19 @@ jobs:
       run: |
         RANDOM_NAME=$(date +%s%N | md5sum | head -c 8).mp4
         
-        echo "=== BẮT ĐẦU TẢI VIDEO TỪ LINK ĐẦU VÀO ==="
         curl -L "$DOWNLOAD_URL" -o "$RANDOM_NAME"
-
-        echo "=== BẮT ĐẦU UPLOAD LÊN HYDRAX ==="
-        RESPONSE=$(curl -S -s -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY")
         
+        RESPONSE=$(curl -S -s -X POST -F "file=@$RANDOM_NAME" "https://up.abyss.to/$HYDRAX_API_KEY")
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | head -n 1 | cut -d'"' -f4)
         
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
-          echo "Upload video mới thành công lên Hydrax. Tag: $HYDRAX_TAG"
-          
-          FULL_CALLBACK_URL="${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
-          
           curl -s -X POST \
             -H "Content-Type: application/json" \
-            -H "X-Worker-Token: $SECRET_AUTH_KEY" \
+            -H "User-Agent: curl/8.1.2" \
+            -H "Accept: */*" \
             -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
-            "$FULL_CALLBACK_URL"
-            
-          echo "Đã gửi tín hiệu callback về VPS thành công."
+            "${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
         else
-          echo "Lỗi Upload. Phản hồi thực tế từ Hydrax: $RESPONSE"
           rm -f "$RANDOM_NAME"
           exit 1
         fi
