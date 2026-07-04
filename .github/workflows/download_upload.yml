@@ -29,10 +29,14 @@ jobs:
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | head -n 1 | cut -d'"' -f4)
         
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
-          curl -s -X POST \
+          echo "=== GỬI CALLBACK VỀ VPS ==="
+          
+          # In ra URL thực tế sau khi ghép biến để kiểm tra cấu trúc (Ẩn secret bảo mật)
+          echo "URL Gửi đi: ${VPS_CALLBACK_URL}?secret=******"
+          
+          # Bắn POST và ép in kết quả HTTP Response Code + Body trả về từ VPS
+          curl -i -X POST \
             -H "Content-Type: application/json" \
-            -H "User-Agent: curl/8.1.2" \
-            -H "Accept: */*" \
             -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
             "${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
         else
