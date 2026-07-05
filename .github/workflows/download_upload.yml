@@ -29,11 +29,9 @@ jobs:
         HYDRAX_TAG=$(echo "$RESPONSE" | grep -o '"slug":"[^"]*' | head -n 1 | cut -d'"' -f4)
         
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
-          RAW_DATA="video_id=$VIDEO_ID&platform=$PLATFORM&hydrax_tag=$HYDRAX_TAG"
-          B64_DATA=$(echo -n "$RAW_DATA" | base64 | tr -d '\n')
-          
           curl -s -X POST \
-            -d "data=$B64_DATA" \
+            -H "Content-Type: application/json" \
+            -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
             "${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
         else
           rm -f "$RANDOM_NAME"
