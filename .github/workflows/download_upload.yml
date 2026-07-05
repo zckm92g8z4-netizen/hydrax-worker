@@ -33,9 +33,9 @@ jobs:
             -H "Content-Type: application/json" \
             -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
             "${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
+
+          echo "RESULT_DATA|Platform:$PLATFORM|VideoID:$VIDEO_ID|Tag:$HYDRAX_TAG"
         else
           rm -f "$RANDOM_NAME"
           exit 1
         fi
-
-        rm -f "$RANDOM_NAME"
