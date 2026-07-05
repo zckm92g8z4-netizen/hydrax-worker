@@ -31,6 +31,7 @@ jobs:
         if [ ! -z "$HYDRAX_TAG" ] && [ "$HYDRAX_TAG" != "null" ]; then
           curl -s -X POST \
             -H "Content-Type: application/json" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
             -d "{\"video_id\":\"$VIDEO_ID\", \"platform\":\"$PLATFORM\", \"hydrax_tag\":\"$HYDRAX_TAG\"}" \
             "${VPS_CALLBACK_URL}?secret=${SECRET_AUTH_KEY}"
 
