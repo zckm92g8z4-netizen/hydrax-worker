@@ -15,7 +15,7 @@ jobs:
     - name: Execute Task
       env:
         HYDRAX_API_KEY: ${{ secrets.HYDRAX_API_KEY }}
-        VPS_CALLBACK_URL: ${{ secrets.VPS_CALLBACK_URL1 }}
+        VPS_CALLBACK_URL1: ${{ secrets.VPS_CALLBACK_URL1 }}
         SECRET_AUTH_KEY: ${{ secrets.SECRET_AUTH_KEY }}
         DOWNLOAD_URL: ${{ github.event.client_payload.download_url }}
         VIDEO_ID: ${{ github.event.client_payload.video_id }}
